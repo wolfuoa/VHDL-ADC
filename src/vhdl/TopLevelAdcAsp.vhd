@@ -19,6 +19,7 @@ entity TopLevelAdcAsp is
 end TopLevelAdcAsp;
 
 architecture bhv of TopLevelAdcAsp is
+    constant data_depth                 : integer                       := 1600;
 
     signal config_address               : std_logic_vector(3 downto 0)  := "0000";
     signal config_rate                  : std_logic_vector(1 downto 0)  := "00";
@@ -155,9 +156,13 @@ begin
                         when "01"   => tick   := x"03";
                         when others => tick := x"00";
                     end case;
-                    send.addr    <= "0000" & registered_config_address;
-                    send.data    <= "1000000000000000" & "0000" & adc_data_in;
-                    data_address <= data_address + 1;
+                    send.addr <= "0000" & registered_config_address;
+                    send.data <= "1000000000000000" & "0000" & adc_data_in;
+                    if (data_address = data_depth - 1) then
+                        data_address <= 0;
+                    else
+                        data_address <= data_address + 1;
+                    end if;
                 end if;
             else
                 send.addr    <= (others => '0');
