@@ -109,7 +109,7 @@ begin
                                     '0';
     with registered_config_resolution select adc_data_in <=
                                                            "0000" & rom12_data_out(11 downto 4) when "00",
-                                                           "00" & rom12_data_out(9 downto 0) when "01", -- 
+                                                           "00" & rom12_data_out(11 downto 2) when "01", -- 
                                                            rom12_data_out(11 downto 0) when others;
 
     process (clock, reset)
