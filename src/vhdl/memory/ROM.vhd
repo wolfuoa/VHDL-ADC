@@ -49,7 +49,7 @@ end entity;
 
 architecture SYN of viktor_rom is
 
-    signal sub_wire0 : std_logic_vector(31 downto 0);
+    signal sub_wire0 : std_logic_vector(11 downto 0);
 
     component altsyncram
         generic (
@@ -70,14 +70,14 @@ architecture SYN of viktor_rom is
             width_byteena_a        : natural
         );
         port (
-            address_a : in  std_logic_vector(15 downto 0);
+            address_a : in  std_logic_vector(13 downto 0);
             clock0    : in  std_logic;
-            q_a       : out std_logic_vector(31 downto 0)
+            q_a       : out std_logic_vector(11 downto 0)
         );
     end component;
 
 begin
-    q <= sub_wire0;
+    q <= (31 downto 12 => '0') & sub_wire0;
 
     altsyncram_component : altsyncram
     generic map(
@@ -88,17 +88,17 @@ begin
         lpm_hint               => "ENABLE_RUNTIME_MOD=NO",
         lpm_type               => "altsyncram",
         maximum_depth          => 4096,
-        numwords_a             => 65536,
+        numwords_a             => 16384,
         operation_mode         => "ROM",
         outdata_aclr_a         => "NONE",
         outdata_reg_a          => "UNREGISTERED",
         ram_block_type         => "M4K",
-        widthad_a              => 16,
-        width_a                => 32,
+        widthad_a              => 14,
+        width_a                => 12,
         width_byteena_a        => 1
     )
     port map(
-        address_a => address,
+        address_a => address(13 downto 0),
         clock0    => clock,
         q_a       => sub_wire0
     );

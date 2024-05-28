@@ -92,7 +92,7 @@ begin
 
     rom12 : entity work.viktor_rom
         generic map(
-            program_file_path => AdcFilePaths.rom_12_file_path
+            program_file_path => AdcFilePaths.rom_12_file_path_wolf
         )
         port map(
             address => converted_data_address,
