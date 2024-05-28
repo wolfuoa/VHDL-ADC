@@ -35,8 +35,6 @@ architecture bhv of TopLevelAdcAsp is
     signal data_address                 : integer                       := 0;
     signal converted_data_address       : std_logic_vector(15 downto 0) := x"0000";
     signal adc_data_in                  : std_logic_vector(11 downto 0) := x"000";
-    signal rom8_data_out                : std_logic_vector(31 downto 0) := x"00000000";
-    signal rom10_data_out               : std_logic_vector(31 downto 0) := x"00000000";
     signal rom12_data_out               : std_logic_vector(31 downto 0) := x"00000000";
 begin
 
@@ -91,26 +89,6 @@ begin
             data_out     => registered_config_enable
         );
 
-    rom8 : entity work.viktor_rom
-        generic map(
-            program_file_path => AdcFilePaths.rom_8_file_path
-        )
-        port map(
-            address => converted_data_address,
-            clock   => clock,
-            q       => rom8_data_out
-        );
-
-    rom10 : entity work.viktor_rom
-        generic map(
-            program_file_path => AdcFilePaths.rom_10_file_path
-        )
-        port map(
-            address => converted_data_address,
-            clock   => clock,
-            q       => rom10_data_out
-        );
-
     rom12 : entity work.viktor_rom
         generic map(
             program_file_path => AdcFilePaths.rom_12_file_path
@@ -128,10 +106,9 @@ begin
 
     config_register_write_enable <= '1' when recv.data(31 downto 28) = "1010" else
                                     '0';
-
     with registered_config_resolution select adc_data_in <=
-                                                           rom8_data_out(11 downto 0) when "00",
-                                                           rom10_data_out(11 downto 0) when "01",
+                                                           "0000" & rom12_data_out(11 downto 4) when "00",
+                                                           "00" & rom12_data_out(9 downto 0) when "01", -- 
                                                            rom12_data_out(11 downto 0) when others;
 
     process (clock, reset)

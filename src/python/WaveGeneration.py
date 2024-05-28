@@ -13,7 +13,7 @@ SNR = 21  # Signal-to-noise ratio in dB
 t = np.arange(1600) # around 100 ms (5 periods)
 
 # Sinusoid generator
-sin_gen = lambda amplitude, delay, harmonic: amplitude*np.sin(harmonic*2*np.pi*f*(t/fs)+delay)
+sin_gen = lambda amplitude, delay, harmonic: amplitude * np.sin(harmonic*2*np.pi*f*(t/fs)+delay)
 
 # Random noise
 noise = np.random.normal(0, 10**(-SNR/20), len(t))
@@ -24,17 +24,16 @@ vt = 0.3 + sin_gen(5, 2.5, 1) + sin_gen(1.5, 1.3, 3) + sin_gen(0.75, 1, 5) + sin
 
 def normalize_to_n_bits(signal, n):
     max_val = 2**n - 1
-
-    normalized_signal = ((signal / np.max(signal)) * max_val).astype(np.uint16)
-
-    return normalized_signal
+    normalized_signal = ((signal / np.max(signal)) * max_val)
+    rounded = np.around(normalized_signal)
+    return rounded.astype(np.uint16)
 
 # shift it up
 vt_shifted = vt - np.min(vt)
 
-vt_8_bit =normalize_to_n_bits(vt_shifted, 8)
-vt_10_bit =normalize_to_n_bits(vt_shifted, 10)
-vt_12_bit =normalize_to_n_bits(vt_shifted, 12)
+vt_8_bit = normalize_to_n_bits(vt_shifted, 8)
+vt_10_bit = normalize_to_n_bits(vt_shifted, 10)
+vt_12_bit = normalize_to_n_bits(vt_shifted, 12)
 
 plt.plot(t, vt_8_bit)
 plt.xlabel('sample')
