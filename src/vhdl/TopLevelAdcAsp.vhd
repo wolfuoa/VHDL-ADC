@@ -113,7 +113,7 @@ begin
                                                            rom12_data_out(11 downto 0) when others;
 
     process (clock, reset)
-        variable tick : unsigned(7 downto 0) := x"00";
+        variable tick : unsigned(11 downto 0) := (others => '0');
     begin
         if reset = '1' then
             data_address <= 0;
@@ -128,10 +128,10 @@ begin
                     data_address <= data_address;
                 else
                     case registered_config_rate is
-                        when "11"   => tick   := x"ff";
-                        when "10"   => tick   := x"0f";
-                        when "01"   => tick   := x"03";
-                        when others => tick := x"00";
+                        when "11"   => tick   := x"C35";
+                        when "10"   => tick   := x"C35";
+                        when "01"   => tick   := x"C35";
+                        when others => tick := x"C35";
                     end case;
                     send.addr <= "0000" & registered_config_address;
                     send.data <= "1000000000000000" & "0000" & adc_data_in;
