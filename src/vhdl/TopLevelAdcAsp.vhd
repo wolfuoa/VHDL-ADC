@@ -8,6 +8,9 @@ library altera_mf;
 use altera_mf.all;
 
 entity TopLevelAdcAsp is
+    generic (
+        default_starting_tick : unsigned := x"C35" -- 3125 -> gives 16kHz when using 50MHz clock
+    );
     port (
         clock  : in  std_logic;
         reset  : in  std_logic;
@@ -142,8 +145,7 @@ begin
                     counter := (others => '0');
                 else
                     counter := counter + 1;
-                    tick    := x"C35"; -- 3125 -> gives 16kHz when using 50MHz clock
-
+                    tick    := default_starting_tick;
                     send.addr <= "0000" & registered_config_address;
                     send.data <= (others => '0');
 
