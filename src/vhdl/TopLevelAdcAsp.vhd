@@ -140,14 +140,14 @@ begin
                 elsif counter = max_tick_count then
                     tick := tick;
                     send.data    <= "1000000000000000" & "0000" & adc_data_in;
-                    send.addr    <= (others => '0');
+                    send.addr    <= "0000" & registered_config_address;
                     data_address <= data_address;
                     counter := (others => '0');
                 else
                     counter := counter + 1;
                     tick    := default_starting_tick;
-                    send.addr <= "0000" & registered_config_address;
                     send.data <= (others => '0');
+                    send.addr <= (others => '0');
 
                     if (data_address = data_depth - 1) then
                         data_address <= 0;
