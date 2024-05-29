@@ -38,7 +38,7 @@ architecture bhv of TopLevelAdcAsp is
     signal adc_data_in                  : std_logic_vector(11 downto 0) := x"000";
     signal rom12_data_out               : std_logic_vector(31 downto 0) := x"00000000";
 
-    signal max_tick_count               : unsigned(2 downto 0)          := x"001";
+    signal max_tick_count               : unsigned(2 downto 0)          := "001";
 begin
 
     converted_data_address <= std_logic_vector(to_unsigned(data_address, 16));
@@ -119,9 +119,9 @@ begin
                                                         "010" when "01",
                                                         "100" when others;
 
-    process (clock, reset)
-        variable tick    : unsigned(11 downto 0) := x"000";
-        variable counter : unsigned(2 downto 0)  := x"000";
+    max : process (clock, reset)
+        variable tick    : unsigned(11 downto 0) := (others => '0');
+        variable counter : unsigned(2 downto 0)  := (others => '0');
     begin
         if reset = '1' then
             data_address <= 0;
@@ -134,18 +134,18 @@ begin
                     send.addr    <= (others => '0');
                     send.data    <= (others => '0');
                     data_address <= data_address;
+                elsif counter = max_tick_count then
+                    tick := tick;
+                    send.data    <= "1000000000000000" & "0000" & adc_data_in;
+                    send.addr    <= (others => '0');
+                    data_address <= data_address;
+                    counter := (others => '0');
                 else
                     counter := counter + 1;
                     tick    := x"C35"; -- 3125 -> gives 16kHz when using 50MHz clock
 
                     send.addr <= "0000" & registered_config_address;
-
-                    if (counter = max_tick_count) then
-                        send.data <= "1000000000000000" & "0000" & adc_data_in;
-                        counter := 0;
-                    else
-                        send.data <= (others => '0');
-                    end if;
+                    send.data <= (others => '0');
 
                     if (data_address = data_depth - 1) then
                         data_address <= 0;
