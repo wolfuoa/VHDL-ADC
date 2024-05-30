@@ -41,7 +41,9 @@ architecture bhv of TopLevelAdcAsp is
     signal adc_data_in                  : std_logic_vector(11 downto 0) := x"000";
     signal rom12_data_out               : std_logic_vector(31 downto 0) := x"00000000";
 
-    signal max_tick_count               : unsigned(2 downto 0)          := "001";
+    signal starting_tick                : unsigned(11 downto 0);
+
+    signal max_tick_count               : unsigned(2 downto 0) := "001";
 begin
 
     converted_data_address <= std_logic_vector(to_unsigned(data_address, 16));
@@ -97,7 +99,7 @@ begin
 
     rom12 : entity work.viktor_rom
         generic map(
-            program_file_path => AdcFilePaths.rom_12_file_path_wolf
+            program_file_path => AdcFilePaths.rom_12_file_path
         )
         port map(
             address => converted_data_address,
@@ -117,10 +119,11 @@ begin
                                                            "00" & rom12_data_out(11 downto 2) when "01", -- 
                                                            rom12_data_out(11 downto 0) when others;
 
-    with registered_config_rate select max_tick_count <=
-                                                        "001" when "00",
-                                                        "100" when "01",
-                                                        "110" when others;
+    with registered_config_rate select starting_tick <=
+                                                       default_starting_tick when "00",
+                                                       x"61A" when "01", -- 32 KHz Read
+                                                       x"30D" when "10", -- 64 KHz Read
+                                                       x"186" when others; -- 128 KHz Read
 
     max : process (clock, reset)
         variable tick    : unsigned(11 downto 0) := (others => '0');
@@ -145,7 +148,7 @@ begin
                     counter := (others => '0');
                 else
                     counter := counter + 1;
-                    tick    := default_starting_tick;
+                    tick    := starting_tick;
                     send.data <= (others => '0');
                     send.addr <= (others => '0');
 
