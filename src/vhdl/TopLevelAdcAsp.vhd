@@ -97,7 +97,7 @@ begin
 
     rom12 : entity work.viktor_rom
         generic map(
-            program_file_path => AdcFilePaths.rom_12_file_path
+            program_file_path => AdcFilePaths.rom_12_file_path_wolf
         )
         port map(
             address => converted_data_address,
@@ -119,8 +119,8 @@ begin
 
     with registered_config_rate select max_tick_count <=
                                                         "001" when "00",
-                                                        "010" when "01",
-                                                        "100" when others;
+                                                        "100" when "01",
+                                                        "110" when others;
 
     max : process (clock, reset)
         variable tick    : unsigned(11 downto 0) := (others => '0');
